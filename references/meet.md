@@ -2,58 +2,57 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> meet <comando> [opciones]
+$SCRIPT --profile <profile> meet <command> [options]
 ```
 
-> Para salas asociadas a un evento de Calendar, usar `calendar create --create-meet` en su lugar.
+> For rooms associated with a Calendar event, use `calendar create --create-meet` instead.
 
 ---
 
 ## `create-space`
-Crea una sala de Meet persistente (independiente de Calendar).
+Creates a persistent Meet room (independent of Calendar).
 ```bash
 meet create-space
 ```
-Devuelve: `{status: "created", name, meetingUri, meetingCode}`.
+Returns: `{status: "created", name, meetingUri, meetingCode}`.
 
-El `name` tiene forma `spaces/XYZ` — guardarlo para comandos posteriores.
+The `name` has the format `spaces/XYZ` — save it for subsequent commands.
 
 ---
 
 ## `get-space`
-Obtiene información de una sala.
+Retrieves information about a room.
 ```bash
 meet get-space <space_name>
 ```
-`space_name` en formato `spaces/XYZ`.
+`space_name` in `spaces/XYZ` format.
 
 ---
 
 ## `patch-space`
-Modifica la configuración de acceso de una sala.
+Modifies the access configuration of a room.
 ```bash
 meet patch-space <space_name> [--access-type OPEN|TRUSTED]
 ```
-- **`space_name`**: ID del espacio en formato `spaces/XYZ`. Se puede obtener automáticamente al crear un evento en Calendar con `--create-meet`.
-- **`--access-type`**: `OPEN` (cualquiera con el link entra) o `TRUSTED` (solo invitados/org).
+- **`space_name`**: Space ID in `spaces/XYZ` format. This can be obtained automatically when creating a Calendar event with `--create-meet`.
+- **`--access-type`**: `OPEN` (anyone with the link can enter) or `TRUSTED` (only invited users/organization).
 
-Devuelve: `{status: "patched", name, config}`.
+Returns: `{status: "patched", name, config}`.
 
 ---
 
 ## `end-conference`
-Finaliza la conferencia activa en una sala (desconecta a todos los participantes).
+Ends the active conference in a room (disconnects all participants).
 ```bash
 meet end-conference <space_name>
 ```
 
-
 ---
 
-## 💡 Receta: Reunión Abierta con Calendar
+## 💡 Recipe: Open Meeting with Calendar
 
-Para crear un evento de calendario donde cualquier persona pueda entrar sin ser admitida:
+To create a calendar event where anyone can join without needing to be admitted:
 
-1. **Crear espacio**: `meet create-space` $\rightarrow$ guarda el `name` (`spaces/XYZ`) y la `meetingUri`.
-2. **Abrir acceso**: `meet patch-space <name> --access-type OPEN`.
-3. **Vincular a Calendar**: `calendar create --summary "..." --start "..." --end "..." --description "Link abierto: <meetingUri>"`.
+1. **Create space**: `meet create-space` $\rightarrow$ save the `name` (`spaces/XYZ`) and the `meetingUri`.
+2. **Open access**: `meet patch-space <name> --access-type OPEN`.
+3. **Link to Calendar**: `calendar create --summary "..." --start "..." --end "..." --description "Open link: <meetingUri>"`.
