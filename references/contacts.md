@@ -2,72 +2,72 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> contacts <comando> [opciones]
+$SCRIPT --profile <profile> contacts <command> [options]
 ```
 
-> **Uso principal de verificación de identidad:** antes de cualquier acción destructiva o envío, ejecutar `contacts list --max 1` y confirmar que el email devuelto corresponde al perfil.
+> **Primary use for identity verification:** before any destructive action or sending, run `contacts list --max 1` and confirm that the returned email matches the intended profile.
 
 ---
 
 ## `list`
-Lista contactos de la cuenta.
+Lists contacts from the account.
 ```bash
 contacts list [--max N]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--max` | int | 20 | Máximo de contactos |
+| `--max` | int | 20 | Maximum number of contacts |
 
-Devuelve: lista de `{name, emails: [...], phones: [...]}`.
+Returns: list of `{name, emails: [...], phones: [...]}`.
 
 ---
 
 ## `search`
-Busca contactos por nombre o email. Más eficiente que `list` para agendas grandes.
+Searches for contacts by name or email. More efficient than `list` for large directories.
 ```bash
 contacts search <query>
 ```
-| Argumento | Tipo | Descripción |
+| Argument | Type | Description |
 |---|---|---|
-| `query` | str (posicional) | Nombre o email a buscar (parcial funciona) |
+| `query` | str (positional) | Name or email to search for (partial matches work) |
 
-Devuelve: lista de `{name, emails: [...], phones: [...]}`.
+Returns: list of `{name, emails: [...], phones: [...]}`.
 
-> Preferir `search` sobre `list` cuando se busca a una persona específica.
+> Prefer `search` over `list` when looking for a specific person.
 
 ---
 
 ## `list-groups`
-Lista todos los grupos/labels de contactos de la cuenta.
+Lists all contact groups/labels for the account.
 ```bash
 contacts list-groups
 ```
-Devuelve: lista de `{id, name, memberCount, type}`.
+Returns: list of `{id, name, memberCount, type}`.
 
-- `id` tiene forma `contactGroups/abc123`.
-- `type: USER_CONTACT_GROUP` — grupos creados por el usuario.
-- `type: SYSTEM_CONTACT_GROUP` — grupos del sistema (ej. "Starred", "All contacts").
+- `id` has the format `contactGroups/abc123`.
+- `type: USER_CONTACT_GROUP` — groups created by the user.
+- `type: SYSTEM_CONTACT_GROUP` — system groups (e.g., "Starred", "All contacts").
 
 ---
 
 ## `list-group`
-Devuelve los miembros de un grupo con sus emails.
+Returns the members of a group along with their emails.
 ```bash
 contacts list-group <group_id>
 ```
-| Argumento | Tipo | Descripción |
+| Argument | Type | Description |
 |---|---|---|
-| `group_id` | str (posicional) | ID del grupo, ej. `contactGroups/abc123` |
+| `group_id` | str (positional) | Group ID, e.g., `contactGroups/abc123` |
 
-Devuelve: lista de `{name, emails: [...]}`.
+Returns: list of `{name, emails: [...]}`.
 
-> **Flujo típico para invitar un grupo a Calendar:**
+> **Typical workflow for inviting a group to Calendar:**
 > ```bash
-> # 1. Encontrar el ID del grupo
+> # 1. Find the group ID
 > contacts list-groups
-> # 2. Obtener emails del grupo
+> # 2. Get group emails
 > contacts list-group "contactGroups/abc123"
-> # 3. Pasar los emails a calendar create
-> calendar create --summary "Reunión" --start "..." --end "..." \
+> # 3. Pass the emails to calendar create
+> calendar create --summary "Meeting" --start "..." --end "..." \
 >   --attendees "juan@gmail.com,maria@gmail.com"
 > ```
