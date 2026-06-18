@@ -2,87 +2,87 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> calendar <comando> [opciones]
+$SCRIPT --profile <profile> calendar <command> [options]
 ```
 
 ---
 
 ## `list`
-Lista eventos próximos de un calendario.
+Lists upcoming events from a calendar.
 ```bash
 calendar list [--start ISO8601] [--end ISO8601] [--calendar-id ID] [--max N]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--start` | ISO8601 | ahora | Inicio del rango |
-| `--end` | ISO8601 | — | Fin del rango (opcional) |
-| `--calendar-id` | str | `primary` | ID del calendario |
-| `--max` | int | 50 | Máximo de resultados |
+| `--start` | ISO8601 | now | Range start |
+| `--end` | ISO8601 | — | Range end (optional) |
+| `--calendar-id` | str | `primary` | Calendar ID |
+| `--max` | int | 50 | Maximum results |
 
-Devuelve: lista de `{id, summary, start, end, location, description, htmlLink, attendees}`.
+Returns: list of `{id, summary, start, end, location, description, htmlLink, attendees}`.
 
 ---
 
 ## `list-calendars`
-Lista todos los calendarios de la cuenta.
+Lists all calendars in the account.
 ```bash
 calendar list-calendars
 ```
-Devuelve: lista de `{id, summary, primary}`.
+Returns: list of `{id, summary, primary}`.
 
 ---
 
 ## `create`
-Crea un evento nuevo, opcionalmente con sala de Meet.
+Creates a new event, optionally with a Meet room.
 ```bash
 calendar create --summary <str> --start <ISO8601> --end <ISO8601> \
                 [--location <str>] [--description <str>] \
                 [--attendees email1,email2] [--calendar-id ID] [--create-meet]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--summary` | str | requerido | Título del evento |
-| `--start` | ISO8601 | requerido | Inicio (ej. `2026-06-16T10:00:00Z`) |
-| `--end` | ISO8601 | requerido | Fin |
-| `--location` | str | — | Ubicación |
-| `--description` | str | — | Descripción |
-| `--attendees` | str | — | Emails separados por coma |
-| `--calendar-id` | str | `primary` | ID del calendario |
-| `--create-meet` | flag | false | Genera sala de Google Meet en el evento |
+| `--summary` | str | required | Event title |
+| `--start` | ISO8601 | required | Start (e.g. `2026-06-16T10:00:00Z`) |
+| `--end` | ISO8601 | required | End |
+| `--location` | str | — | Location |
+| `--description` | str | — | Description |
+| `--attendees` | str | — | Comma-separated emails |
+| `--calendar-id` | str | `primary` | Calendar ID |
+| `--create-meet` | flag | false | Generates a Google Meet room for the event |
 
-Devuelve: `{status: "created", id, summary, htmlLink, conferenceData, space_id?}`.
+Returns: `{status: "created", id, summary, htmlLink, conferenceData, space_id?}`.
 
-> **Nota:** `space_id` (formato `spaces/XYZ`) se devuelve únicamente cuando `--create-meet` es verdadero. Es el identificador necesario para modificar la configuración de la sala usando la sub-skill de Meet (ej. cambiar acceso a `OPEN`).
+> **Note:** `space_id` (format `spaces/XYZ`) is returned only when `--create-meet` is true. This is the identifier required to modify the room configuration using the Meet sub-skill (e.g., changing access to `OPEN`).
 
 ---
 
 ## `update`
-Edita un evento existente. Solo se modifican los campos que se pasen — el resto se preserva.
+Edits an existing event. Only passed fields are modified — others are preserved.
 ```bash
 calendar update <event_id> [--summary <str>] [--start <ISO8601>] [--end <ISO8601>] \
                             [--location <str>] [--description <str>] \
                             [--attendees email1,email2] [--calendar-id ID]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `event_id` | str (posicional) | requerido | ID del evento |
-| `--summary` | str | — | Nuevo título |
-| `--start` | ISO8601 | — | Nueva hora de inicio |
-| `--end` | ISO8601 | — | Nueva hora de fin |
-| `--location` | str | — | Nueva ubicación (pasar `""` para borrar) |
-| `--description` | str | — | Nueva descripción (pasar `""` para borrar) |
-| `--attendees` | str | — | Lista completa de asistentes (reemplaza la existente) |
-| `--calendar-id` | str | `primary` | ID del calendario |
+| `event_id` | str (positional) | required | Event ID |
+| `--summary` | str | — | New title |
+| `--start` | ISO8601 | — | New start time |
+| `--end` | ISO8601 | — | New end time |
+| `--location` | str | — | New location (pass `""` to clear) |
+| `--description` | str | — | New description (pass `""` to clear) |
+| `--attendees` | str | — | Full attendee list (replaces existing) |
+| `--calendar-id` | str | `primary` | Calendar ID |
 
-Devuelve: `{status: "updated", id, summary, start, end, htmlLink}`.
+Returns: `{status: "updated", id, summary, start, end, htmlLink}`.
 
-> `sendUpdates: "none"` está hardcodeado — nunca se notifica a los asistentes.
+> `sendUpdates: "none"` is hardcoded — attendees are never notified.
 
 ---
 
 ## `delete`
-Elimina un evento.
+Deletes an event.
 ```bash
 calendar delete <event_id> [--calendar-id ID]
 ```
-Devuelve: `{status: "deleted", eventId}`.
+Returns: `{status: "deleted", eventId}`.
