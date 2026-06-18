@@ -1,83 +1,83 @@
-# references/setup.md — Autorización OAuth y gestión de perfiles
+# references/setup.md — OAuth Authorization and Profile Management
 
 Script: `python3 ${HERMES_SKILL_DIR}/scripts/setup.py`
 
 ---
 
-## Flujo completo de autorización
+## Full Authorization Flow
 
-### 1. Instalar dependencias (una sola vez)
+### 1. Install Dependencies (once)
 ```bash
 python3 ${HERMES_SKILL_DIR}/scripts/setup.py --install-deps
 ```
 
-### 2. Registrar client secret del proyecto GCP
+### 2. Register GCP Project Client Secret
 ```bash
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --client-secret /ruta/google_client_secret.json
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --client-secret /path/google_client_secret.json
 ```
-El archivo debe contener la clave `installed` o `web` en la raíz.
-Se guarda en `~/.hermes/gworkspace-multi.json` bajo `client_secret`.
+The file must contain the `installed` or `web` key at the root.
+It is saved in `~/.hermes/gworkspace-multi.json` under `client_secret`.
 
-> 💡 Para no dejar el archivo en disco, créalo en `/tmp/` y pásalo desde ahí.
+> 💡 To avoid leaving the file on disk, create it in `/tmp/` and pass it from there.
 
-> ⚠️ **Múltiples proyectos GCP:** el sistema almacena un único client secret global. Si usas distintos Client IDs para distintos perfiles, completa el flujo completo de un perfil (`--auth-url` → `--auth-code`) antes de cambiar el secret para el siguiente.
+> ⚠️ **Multiple GCP Projects:** The system stores a single global client secret. If you use different Client IDs for different profiles, complete the full flow for one profile (`--auth-url` $\rightarrow$ `--auth-code`) before changing the secret for the next one.
 
-### 3. Generar URL de autorización
+### 3. Generate Authorization URL
 ```bash
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --auth-url --profile <perfil> [--services all|email,calendar,...]
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --auth-url --profile <profile> [--services all|email,calendar,...]
 ```
-Devuelve `{"auth_url": "https://accounts.google.com/o/oauth2/..."}`.
+Returns `{"auth_url": "https://accounts.google.com/o/oauth2/..."}`.
 
-**Servicios disponibles:** `email`, `calendar`, `drive`, `docs`, `sheets`, `tasks`, `meet`, `scripts`, `contacts` (o `all`).
+**Available services:** `email`, `calendar`, `drive`, `docs`, `sheets`, `tasks`, `meet`, `scripts`, `contacts` (or `all`).
 
-### 4. Autorizar en el navegador
-- Abrir en **ventana de incógnito**.
-- Añadir `&login_hint=correo@ejemplo.com` al final de la URL para forzar la cuenta correcta.
-- Completar el flujo hasta la pantalla de error de redirección — es esperado.
-- Copiar la **URL completa** de la barra de direcciones.
+### 4. Authorize in Browser
+- Open in an **incognito window**.
+- Add `&login_hint=email@example.com` to the end of the URL to force the correct account.
+- Complete the flow until the redirection error screen — this is expected.
+- Copy the **complete URL** from the address bar.
 
-> **Nota:** El `redirect_uri` usado es `http://localhost:1`, lo que provoca un error de conexión en el navegador. Esto es intencional: el `code` aparece en la URL de la barra de direcciones y se extrae automáticamente al pasarlo a `--auth-code`.
+> **Note:** The `redirect_uri` used is `http://localhost:1`, which causes a connection error in the browser. This is intentional: the `code` appears in the URL of the address bar and is automatically extracted when passed to `--auth-code`.
 
-### 5. Intercambiar el código
+### 5. Exchange the Code
 ```bash
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --auth-code "URL_COMPLETA_O_SOLO_EL_CODE" --profile <perfil>
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --auth-code "COMPLETE_URL_OR_JUST_THE_CODE" --profile <profile>
 ```
-El token se guarda en `profiles.<perfil>` dentro de `~/.hermes/gworkspace-multi.json`.
+The token is saved in `profiles.<profile>` inside `~/.hermes/gworkspace-multi.json`.
 
-### 6. Verificar
+### 6. Verify
 ```bash
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --check --profile <perfil>
-# Confirmar con una llamada real:
-python3 ${HERMES_SKILL_DIR}/scripts/google_api.py --profile <perfil> contacts list --max 1
-```
-
----
-
-## Comandos de gestión
-
-```bash
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --list-profiles                    # listar perfiles autorizados
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --check [--profile <p>]            # verificar estado del token
-python3 ${HERMES_SKILL_DIR}/scripts/setup.py --revoke --profile <p>             # revocar y eliminar token
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --check --profile <profile>
+# Confirm with a real call:
+python3 ${HERMES_SKILL_DIR}/scripts/google_api.py --profile <profile> contacts list --max 1
 ```
 
 ---
 
-## 🚩 Pitfalls comunes
+## Management Commands
 
-| Error | Causa | Solución |
+```bash
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --list-profiles                    # list authorized profiles
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --check [--profile <p>]            # verify token status
+python3 ${HERMES_SKILL_DIR}/scripts/setup.py --revoke --profile <p>             # revoke and remove token
+```
+
+---
+
+## 🚩 Common Pitfalls
+
+| Error | Cause | Solution |
 |---|---|---|
-| `Invalid Code Verifier` | Reutilizar pestaña o código viejo | Cerrar todo, incógnito nueva, generar URL fresca |
-| `Token expirado` | Token vencido sin refresh | Re-autorizar con `--auth-url` |
-| `No token found for profile` | Perfil no autorizado o nombre incorrecto | `--list-profiles` para ver perfiles existentes |
-| Acción aplicada a cuenta incorrecta | Ghosting de perfil | Verificar siempre con `contacts list --max 1` antes |
-| `Corrupted config file` | `gworkspace-multi.json` está dañado | Hacer backup, borrar, y reconfigurar desde `--client-secret` |
+| `Invalid Code Verifier` | Reusing tab or old code | Close everything, new incognito window, generate fresh URL |
+| `Token expired` | Expired token without refresh | Re-authorize with `--auth-url` |
+| `No token found for profile` | Profile not authorized or incorrect name | `--list-profiles` to see existing profiles |
+| Action applied to wrong account | Profile ghosting | Always verify with `contacts list --max 1` before |
+| `Corrupted config file` | `gworkspace-multi.json` is damaged | Make backup, delete, and reconfigure from `--client-secret` |
 
 ---
 
-## 🔍 Reporte de diagnóstico
+## 🔍 Diagnostic Report
 
-Para fallos persistentes:
-1. **Contexto:** qué se intentaba hacer y con qué perfil.
-2. **Inventario:** contenido de `~/.hermes/gworkspace-multi.json` (redactar tokens y client_secret).
-3. **Traza:** comandos ejecutados en orden y error exacto de cada uno.
+For persistent failures:
+1. **Context:** what was being attempted and with which profile.
+2. **Inventory:** content of `~/.hermes/gworkspace-multi.json` (redact tokens and client_secret).
+3. **Trace:** commands executed in order and the exact error for each one.
