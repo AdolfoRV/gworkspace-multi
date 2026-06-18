@@ -2,33 +2,33 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> scripts <comando> [opciones]
+$SCRIPT --profile <profile> scripts <command> [options]
 ```
 
-> Para encontrar scripts disponibles en Drive:
+> To find available scripts in Drive:
 > ```bash
-> $SCRIPT --profile <perfil> drive search "mimeType='application/vnd.google-apps.script'" --raw-query
+> $SCRIPT --profile <profile> drive search "mimeType='application/vnd.google-apps.script'" --raw-query
 > ```
 
 ---
 
 ## `run`
-Ejecuta una función de un Apps Script desplegado como API ejecutable.
+Executes a function from an Apps Script deployed as an executable API.
 ```bash
-scripts run <script_id> --function <nombre> [--params '<JSON_array>']
+scripts run <script_id> --function <name> [--params '<JSON_array>']
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `script_id` | str (posicional) | requerido | ID del script |
-| `--function` | str | requerido | Nombre de la función a ejecutar |
-| `--params` | JSON array | — | Parámetros, ej. `'["arg1", 42]'` |
+| `script_id` | str (positional) | required | Script ID |
+| `--function` | str | required | Name of the function to execute |
+| `--params` | JSON array | — | Parameters, e.g. `'["arg1", 42]'` |
 
-Devuelve: `{status: "ok", response}` o `{status: "script_error", error}`.
+Returns: `{status: "ok", response}` or `{status: "script_error", error}`.
 
 ---
 
 ## `get-project`
-Obtiene metadatos de un proyecto de Apps Script.
+Retrieves metadata for an Apps Script project.
 ```bash
 scripts get-project <script_id>
 ```
@@ -36,7 +36,7 @@ scripts get-project <script_id>
 ---
 
 ## `get-content`
-Obtiene el código fuente de un proyecto de Apps Script.
+Retrieves the source code of an Apps Script project.
 ```bash
 scripts get-content <script_id>
 ```
