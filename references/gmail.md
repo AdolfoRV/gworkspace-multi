@@ -2,161 +2,161 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> gmail <comando> [opciones]
+$SCRIPT --profile <profile> gmail <command> [options]
 ```
 
 ---
 
 ## `search`
-Busca mensajes. Acepta cualquier query de Gmail (`is:unread`, `from:`, `subject:`, etc.).
+Searches for messages. Accepts any Gmail query (`is:unread`, `from:`, `subject:`, etc.).
 ```bash
 gmail search <query> [--max N]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `query` | str (posicional) | requerido | Query de Gmail |
-| `--max` | int | 10 | Máximo de resultados |
+| `query` | str (positional) | required | Gmail query |
+| `--max` | int | 10 | Maximum results |
 
-Devuelve: lista de `{id, threadId, from, to, subject, date, snippet, labels}`.
+Returns: list of `{id, threadId, from, to, subject, date, snippet, labels}`.
 
 ---
 
 ## `get`
-Obtiene el contenido completo de un mensaje (cuerpo incluido).
+Retrieves the full content of a message (including body).
 ```bash
 gmail get <message_id>
 ```
-Devuelve: `{id, threadId, from, to, subject, date, labels, body}`.
+Returns: `{id, threadId, from, to, subject, date, labels, body}`.
 
 ---
 
 ## `send`
-Envía un email nuevo.
+Sends a new email.
 ```bash
 gmail send --to <addr> --subject <str> --body <str> [--from <addr>] [--html] [--reply-to <msg_id>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--to` | str | requerido | Destinatario |
-| `--subject` | str | requerido | Asunto |
-| `--body` | str | requerido | Cuerpo del mensaje |
-| `--from` | str | — | Remitente explícito (alias de cuenta) |
-| `--html` | flag | false | Enviar como HTML (multipart/alternative con fallback plain) |
-| `--reply-to` | str | — | Message-ID al que se responde (añade headers In-Reply-To/References) |
+| `--to` | str | required | Recipient |
+| `--subject` | str | required | Subject |
+| `--body` | str | required | Message body |
+| `--from` | str | — | Explicit sender (account alias) |
+| `--html` | flag | false | Send as HTML (multipart/alternative with plain fallback) |
+| `--reply-to` | str | — | Message-ID being replied to (adds In-Reply-To/References headers) |
 
-Devuelve: `{status: "sent", id, threadId}`.
+Returns: `{status: "sent", id, threadId}`.
 
 ---
 
 ## `reply`
-Responde a un mensaje existente, manteniendo el hilo.
+Replies to an existing message, maintaining the thread.
 ```bash
 gmail reply <message_id> --body <str> [--from <addr>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `message_id` | str (posicional) | requerido | ID del mensaje original |
-| `--body` | str | requerido | Cuerpo de la respuesta |
-| `--from` | str | — | Remitente explícito |
+| `message_id` | str (positional) | required | Original message ID |
+| `--body` | str | required | Reply body |
+| `--from` | str | — | Explicit sender |
 
-Devuelve: `{status: "sent", id, threadId}`.
+Returns: `{status: "sent", id, threadId}`.
 
 ---
 
 ## `labels`
-Lista todos los labels de la cuenta.
+Lists all labels for the account.
 ```bash
 gmail labels
 ```
-Devuelve: lista de `{id, name, type}`.
+Returns: list of `{id, name, type}`.
 
 ---
 
 ## `modify`
-Añade o quita labels a un mensaje.
+Adds or removes labels from a message.
 ```bash
 gmail modify <message_id> [--add-labels L1 L2] [--remove-labels L1 L2]
 ```
-| Argumento | Tipo | Descripción |
+| Argument | Type | Description |
 |---|---|---|
-| `message_id` | str (posicional) | ID del mensaje |
-| `--add-labels` | str… | IDs de labels a añadir |
-| `--remove-labels` | str… | IDs de labels a quitar |
+| `message_id` | str (positional) | Message ID |
+| `--add-labels` | str... | Label IDs to add |
+| `--remove-labels` | str... | Label IDs to remove |
 
-**Alias útiles:**
-- Archivar: `--remove-labels INBOX`
-- Marcar leído: `--remove-labels UNREAD`
-- Destacar: `--add-labels STARRED`
-- Mover a spam: `--add-labels SPAM --remove-labels INBOX`
+**Useful aliases:**
+- Archive: `--remove-labels INBOX`
+- Mark as read: `--remove-labels UNREAD`
+- Star: `--add-labels STARRED`
+- Move to spam: `--add-labels SPAM --remove-labels INBOX`
 
 ---
 
 ## `get-attachments`
-Descarga todos los adjuntos de un mensaje a disco.
+Downloads all attachments from a message to disk.
 ```bash
 gmail get-attachments <message_id> [--output <dir>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `message_id` | str (posicional) | requerido | ID del mensaje |
-| `--output` | str | `~/Downloads` | Directorio de destino |
+| `message_id` | str (positional) | required | Message ID |
+| `--output` | str | `~/Downloads` | Destination directory |
 
-Devuelve: `{status: "saved", messageId, attachments: [{filename, path, size}]}`.
-Si el mensaje no tiene adjuntos: `{status: "no_attachments", messageId}`.
+Returns: `{status: "saved", messageId, attachments: [{filename, path, size}]}`.
+If no attachments: `{status: "no_attachments", messageId}`.
 
 ---
 
 ## `draft-create`
-Crea un borrador sin enviarlo.
+Creates a draft without sending it.
 ```bash
 gmail draft-create --to <addr> --subject <str> --body <str> [--from <addr>] [--html] [--reply-to-id <msg_id>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--to` | str | requerido | Destinatario |
-| `--subject` | str | requerido | Asunto |
-| `--body` | str | requerido | Cuerpo |
-| `--from` | str | — | Remitente explícito |
-| `--html` | flag | false | Cuerpo en HTML |
-| `--reply-to-id` | str | — | ID del mensaje original para reply draft |
+| `--to` | str | required | Recipient |
+| `--subject` | str | required | Subject |
+| `--body` | str | required | Body |
+| `--from` | str | — | Explicit sender |
+| `--html` | flag | false | HTML body |
+| `--reply-to-id` | str | — | Original message ID for reply draft |
 
-Devuelve: `{status: "draft_created", draftId, messageId}`.
+Returns: `{status: "draft_created", draftId, messageId}`.
 
 ## `draft-send`
-Envía un borrador existente.
+Sends an existing draft.
 ```bash
 gmail draft-send <draft_id>
 ```
-Devuelve: `{status: "sent", id, threadId}`.
+Returns: `{status: "sent", id, threadId}`.
 
-> **Flujo draft para revisión humana:**
+> **Draft workflow for human review:**
 > ```bash
-> gmail draft-create --to "foo@bar.com" --subject "Propuesta" --body "..."
+> gmail draft-create --to "foo@bar.com" --subject "Proposal" --body "..."
 > # → {draftId: "r123..."}
-> # humano revisa en Gmail, luego:
+> # human reviews in Gmail, then:
 > gmail draft-send "r123..."
 > ```
 
 ---
 
 ## `schedule`
-Programa la creación de un borrador para ser enviado en una fecha futura. 
-**Nota:** La API de Gmail no soporta envío programado nativo; esta función crea el borrador y genera un comando para el sistema `at`.
+Schedules the creation of a draft to be sent at a future date.
+**Note:** The Gmail API does not support native scheduled sending; this function creates the draft and generates a command for the `at` system.
 
 ```bash
 gmail schedule --to <addr> --subject <str> --body <str> --send-at <ISO8601> [--from <addr>] [--html]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--to` | str | requerido | Destinatario |
-| `--subject` | str | requerido | Asunto |
-| `--body` | str | requerido | Cuerpo |
-| `--send-at` | ISO8601 | requerido | Fecha/hora de envío (debe incluir TZ, ej. `2026-06-20T15:00:00Z`) |
-| `--from` | str | — | Remitente explícito |
-| `--html` | flag | false | Enviar como HTML |
+| `--to` | str | required | Recipient |
+| `--subject` | str | required | Subject |
+| `--body` | str | required | Body |
+| `--send-at` | ISO8601 | required | Send date/time (must include TZ, e.g. `2026-06-20T15:00:00Z`) |
+| `--from` | str | — | Explicit sender |
+| `--html` | flag | false | Send as HTML |
 
-Devuelve: `{status: "draft_created", draftId, messageId, send_at, send_at_unix, note, at_command}`.
+Returns: `{status: "draft_created", draftId, messageId, send_at, send_at_unix, note, at_command}`.
 
-> **Flujo de envío programado:**
-> 1. Ejecutar `gmail schedule ...` $\rightarrow$ obtener `at_command`.
-> 2. Ejecutar el `at_command` en la terminal para que el sistema operativo dispare el envío mediante `gmail draft-send` en la fecha indicada.
+> **Scheduled sending workflow:**
+> 1. Run `gmail schedule ...` $\rightarrow$ obtain `at_command`.
+> 2. Run the `at_command` in the terminal so the operating system triggers the send via `gmail draft-send` at the indicated date.
