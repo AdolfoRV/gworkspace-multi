@@ -2,50 +2,50 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> sheets <comando> [opciones]
+$SCRIPT --profile <profile> sheets <command> [options]
 ```
 
 ---
 
 ## `create`
-Crea una hoja de cálculo nueva.
+Creates a new spreadsheet.
 ```bash
-sheets create --title <str> [--sheet-name <nombre_hoja>]
+sheets create --title <str> [--sheet-name <sheet_name>]
 ```
-Devuelve: `{status: "created", spreadsheetId, title, spreadsheetUrl}`.
+Returns: `{status: "created", spreadsheetId, title, spreadsheetUrl}`.
 
 ---
 
 ## `get`
-Lee valores de un rango.
+Reads values from a range.
 ```bash
 sheets get <sheet_id> <range>
 ```
-| Argumento | Descripción |
+| Argument | Description |
 |---|---|
-| `sheet_id` | ID del spreadsheet |
-| `range` | Rango en notación A1, ej. `Hoja1!A1:C10` o `A:Z` |
+| `sheet_id` | Spreadsheet ID |
+| `range` | Range in A1 notation, e.g. `Sheet1!A1:C10` or `A:Z` |
 
-Devuelve: lista de listas con los valores del rango.
+Returns: list of lists with the range values.
 
 ---
 
 ## `update`
-Escribe valores en un rango (sobreescribe).
+Writes values to a range (overwrites).
 ```bash
 sheets update <sheet_id> <range> --values '<JSON>'
 ```
-`--values` es un JSON de lista de listas, ej. `'[["a","b"],["c","d"]]'`.
+`--values` is a JSON list of lists, e.g. `'[["a","b"],["c","d"]]'`.
 
-Devuelve: `{status: "updated", updatedRange, updatedRows, updatedCells}`.
+Returns: `{status: "updated", updatedRange, updatedRows, updatedCells}`.
 
 ---
 
 ## `append`
-Agrega filas al final del rango especificado (inserta debajo de los datos existentes).
+Adds rows to the end of the specified range (inserts below existing data).
 ```bash
 sheets append <sheet_id> <range> --values '<JSON>'
 ```
-Mismo formato que `update`.
+Same format as `update`.
 
-Devuelve: `{status: "appended", updatedRange, updatedRows}`.
+Returns: `{status: "appended", updatedRange, updatedRows}`.
