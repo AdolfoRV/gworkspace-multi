@@ -2,58 +2,58 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> tasks <comando> [opciones]
+$SCRIPT --profile <profile> tasks <command> [options]
 ```
 
 ---
 
 ## `list-lists`
-Lista las listas de tareas disponibles en la cuenta.
+Lists available task lists in the account.
 ```bash
 tasks list-lists
 ```
-Devuelve: lista de `{id, title, updated}`. Usar los IDs en los demás comandos.
+Returns: list of `{id, title, updated}`. Use these IDs in other commands.
 
 ---
 
 ## `list`
-Lista tareas de una lista.
+Lists tasks from a specific list.
 ```bash
 tasks list [--tasklist ID] [--show-completed] [--max N]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--tasklist` | str | `@default` | ID de la lista (obtener con `list-lists`) |
-| `--show-completed` | flag | false | Incluir tareas completadas |
-| `--max` | int | 50 | Máximo de resultados |
+| `--tasklist` | str | `@default` | List ID (obtain with `list-lists`) |
+| `--show-completed` | flag | false | Include completed tasks |
+| `--max` | int | 50 | Maximum results |
 
-> ⚠️ Usar siempre `--tasklist <id>` como flag, nunca como argumento posicional.
+> ⚠️ Always use `--tasklist <id>` as a flag, never as a positional argument.
 
 ---
 
 ## `create`
-Crea una tarea nueva.
+Creates a new task.
 ```bash
 tasks create --title <str> [--notes <str>] [--due <ISO8601>] [--tasklist ID]
 ```
-La fecha `--due` debe ser RFC 3339, ej. `2026-06-20T00:00:00Z`.
+The `--due` date must be RFC 3339, e.g. `2026-06-20T00:00:00Z`.
 
-Devuelve: `{status: "created", id, title, due, task_status}`.
+Returns: `{status: "created", id, title, due, task_status}`.
 
 ---
 
 ## `complete`
-Marca una tarea como completada.
+Marks a task as completed.
 ```bash
 tasks complete <task_id> [--tasklist ID]
 ```
-Devuelve: `{status: "completed", id, title}`.
+Returns: `{status: "completed", id, title}`.
 
 ---
 
 ## `delete`
-Elimina una tarea permanentemente.
+Permanently deletes a task.
 ```bash
 tasks delete <task_id> [--tasklist ID]
 ```
-Devuelve: `{status: "deleted", taskId}`.
+Returns: `{status: "deleted", taskId}`.
