@@ -2,32 +2,32 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> docs <comando> [opciones]
+$SCRIPT --profile <profile> docs <command> [options]
 ```
 
 ---
 
 ## `get`
-Obtiene el texto plano de un Google Doc.
+Retrieves the plain text of a Google Doc.
 ```bash
 docs get <doc_id>
 ```
-Devuelve: `{documentId, title, text, revisionId}`.
+Returns: `{documentId, title, text, revisionId}`.
 
 ---
 
 ## `create`
-Crea un Google Doc nuevo, opcionalmente con contenido inicial.
+Creates a new Google Doc, optionally with initial content.
 ```bash
-docs create --title <str> [--body <texto>]
+docs create --title <str> [--body <text>]
 ```
-Devuelve: `{status: "created", documentId, title, url}`.
+Returns: `{status: "created", documentId, title, url}`.
 
 ---
 
 ## `append`
-Agrega texto al final de un documento existente.
+Adds text to the end of an existing document.
 ```bash
-docs append <doc_id> --text <texto>
+docs append <doc_id> --text <text>
 ```
-Devuelve: `{status: "appended", documentId, inserted_at, characters}`.
+Returns: `{status: "appended", documentId, inserted_at, characters}`.
