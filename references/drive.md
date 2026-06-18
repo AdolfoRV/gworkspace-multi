@@ -2,117 +2,117 @@
 
 ```bash
 SCRIPT="python3 ~/.hermes/skills/productivity/gworkspace-multi/scripts/google_api.py"
-$SCRIPT --profile <perfil> drive <comando> [opciones]
+$SCRIPT --profile <profile> drive <command> [options]
 ```
 
 ---
 
 ## `search`
-Busca archivos. Por defecto usa búsqueda de texto completo.
+Searches for files. Uses full-text search by default.
 ```bash
 drive search <query> [--max N] [--raw-query]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `query` | str (posicional) | requerido | Texto a buscar |
-| `--max` | int | 10 | Máximo de resultados |
-| `--raw-query` | flag | false | Usar `query` como query Drive API cruda (ej. `mimeType='application/pdf'`) |
+| `query` | str (positional) | required | Search text |
+| `--max` | int | 10 | Maximum results |
+| `--raw-query` | flag | false | Use `query` as a raw Drive API query (e.g. `mimeType='application/pdf'`) |
 
-Devuelve: lista de `{id, name, mimeType, modifiedTime, webViewLink, size}`.
+Returns: list of `{id, name, mimeType, modifiedTime, webViewLink, size}`.
 
-> Para encontrar Apps Scripts: `drive search "mimeType='application/vnd.google-apps.script'" --raw-query`
+> To find Apps Scripts: `drive search "mimeType='application/vnd.google-apps.script'" --raw-query`
 
 ---
 
 ## `get`
-Obtiene metadatos de un archivo.
+Retrieves metadata for a file.
 ```bash
 drive get <file_id>
 ```
-Devuelve: `{id, name, mimeType, modifiedTime, size, webViewLink, parents, owners}`.
+Returns: `{id, name, mimeType, modifiedTime, size, webViewLink, parents, owners}`.
 
 ---
 
 ## `upload`
-Sube un archivo local a Drive.
+Uploads a local file to Drive.
 ```bash
-drive upload <local_path> [--name <nombre>] [--parent <folder_id>]
+drive upload <local_path> [--name <name>] [--parent <folder_id>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `local_path` | str (posicional) | requerido | Ruta local del archivo |
-| `--name` | str | nombre original | Nombre en Drive |
-| `--parent` | str | — | ID de carpeta destino |
+| `local_path` | str (positional) | required | Local file path |
+| `--name` | str | original name | Name in Drive |
+| `--parent` | str | — | Destination folder ID |
 
-Devuelve: `{status: "uploaded", id, name, mimeType, webViewLink}`.
+Returns: `{status: "uploaded", id, name, mimeType, webViewLink}`.
 
 ---
 
 ## `download`
-Descarga un archivo. Los Google Docs/Sheets/Slides se exportan automáticamente.
+Downloads a file. Google Docs/Sheets/Slides are exported automatically.
 ```bash
-drive download <file_id> [--output <ruta>] [--export-mime <mime>]
+drive download <file_id> [--output <path>] [--export-mime <mime>]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `file_id` | str (posicional) | requerido | ID del archivo |
-| `--output` | str | `~/Downloads/<nombre>` | Ruta de salida |
-| `--export-mime` | str | — | MIME de exportación (sobreescribe el default) |
+| `file_id` | str (positional) | required | File ID |
+| `--output` | str | `~/Downloads/<name>` | Output path |
+| `--export-mime` | str | — | Export MIME type (overrides default) |
 
-**Exportaciones por defecto:**
-- Google Doc → PDF
-- Google Sheet → CSV
-- Google Slides → PDF
-- Google Drawing → PNG
+**Default exports:**
+- Google Doc $\rightarrow$ PDF
+- Google Sheet $\rightarrow$ CSV
+- Google Slides $\rightarrow$ PDF
+- Google Drawing $\rightarrow$ PNG
 
-Devuelve: `{status: "downloaded", id, name, path, mimeType}`.
+Returns: `{status: "downloaded", id, name, path, mimeType}`.
 
 ---
 
 ## `create-folder`
-Crea una carpeta en Drive.
+Creates a folder in Drive.
 ```bash
 drive create-folder <name> [--parent <folder_id>]
 ```
-Devuelve: `{status: "created", id, name, webViewLink}`.
+Returns: `{status: "created", id, name, webViewLink}`.
 
 ---
 
 ## `share`
-Comparte un archivo con un usuario, grupo o dominio.
+Shares a file with a user, group, or domain.
 ```bash
 drive share <file_id> [--email <addr>] [--role reader|writer|commenter|owner] \
-                      [--type user|group|domain|anyone] [--domain <dominio>] [--notify]
+                      [--type user|group|domain|anyone] [--domain <domain>] [--notify]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `file_id` | str (posicional) | requerido | ID del archivo |
-| `--email` | str | — | Email del destinatario (para type=user/group) |
-| `--role` | str | `reader` | Nivel de acceso |
-| `--type` | str | `user` | Tipo de permiso |
-| `--domain` | str | — | Dominio (para type=domain) |
-| `--notify` | flag | false | Enviar email de notificación |
+| `file_id` | str (positional) | required | File ID |
+| `--email` | str | — | Recipient email (for type=user/group) |
+| `--role` | str | `reader` | Access level |
+| `--type` | str | `user` | Permission type |
+| `--domain` | str | — | Domain (for type=domain) |
+| `--notify` | flag | false | Send notification email |
 
-Devuelve: `{status: "shared", permissionId, fileId, role, type}`.
+Returns: `{status: "shared", permissionId, fileId, role, type}`.
 
 ---
 
 ## `delete`
-Mueve a papelera (default) o elimina permanentemente.
+Moves to trash (default) or deletes permanently.
 ```bash
 drive delete <file_id> [--permanent]
 ```
-Devuelve: `{status: "trashed"|"deleted", fileId, permanent}`.
+Returns: `{status: "trashed"|"deleted", fileId, permanent}`.
 
 ---
 
 ## `activity`
-Consulta la actividad reciente sobre un archivo o carpeta (Drive Activity API).
+Queries recent activity on a file or folder (Drive Activity API).
 ```bash
 drive activity [--item-name items/<file_id>] [--ancestor-name items/<folder_id>] [--max N]
 ```
-| Argumento | Tipo | Default | Descripción |
+| Argument | Type | Default | Description |
 |---|---|---|---|
-| `--item-name` | str | — | Actividad sobre un archivo: `items/<file_id>` |
-| `--ancestor-name` | str | — | Actividad dentro de una carpeta: `items/<folder_id>` |
-| `--max` | int | 10 | Máximo de resultados |
+| `--item-name` | str | — | Activity on a file: `items/<file_id>` |
+| `--ancestor-name` | str | — | Activity within a folder: `items/<folder_id>` |
+| `--max` | int | 10 | Maximum results |
