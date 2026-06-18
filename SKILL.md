@@ -1,18 +1,18 @@
 ---
 name: gworkspace-multi
-description: Gmail, Calendar, Drive, Docs, Sheets, Tasks, Meet, Apps Script, Contacts — gestión de múltiples cuentas Google con soporte nativo de perfiles.
+description: Gmail, Calendar, Drive, Docs, Sheets, Tasks, Meet, Apps Script, Contacts — multi-account Google Workspace management with native profile support.
 version: 1.0.0
 author: AdolfoRV
 required_environment_variables:
   - name: HERMES_HOME
-    prompt: "Directorio de configuración de Hermes"
-    help: "Ruta base donde Hermes almacena configs y skills. Por defecto: ~/.hermes"
-    required_for: "ubicación del archivo gworkspace-multi.json"
+    prompt: "Hermes configuration directory"
+    help: "Base path where Hermes stores configs and skills. Default: ~/.hermes"
+    required_for: "location of the gworkspace-multi.json file"
 required_credential_files:
   - path: gworkspace-multi.json
-    description: "Config unificada de la skill: client_secret, profiles, pending OAuth sessions (Permisos 0600)"
+    description: "Unified skill config: client_secret, profiles, pending OAuth sessions (Permissions 0600)"
   - path: client_secret.json
-    description: "Google OAuth2 client credentials (Permisos 0600)"
+    description: "Google OAuth2 client credentials (Permissions 0600)"
 metadata:
   hermes:
     tags: [productivity, google, workspace, gmail, calendar, drive, docs, sheets, oauth, multi-account]
@@ -23,73 +23,81 @@ metadata:
     fallback_for_tools: []
     config:
       - key: gworkspace-multi.default_profile
-        description: "Perfil de Google por defecto cuando no se especifica --profile"
+        description: "Default Google profile used when --profile is not specified"
         default: ""
-        prompt: "Nombre del perfil Google por defecto (ej. personal, work, universidad)"
+        prompt: "Default Google profile name (e.g. personal, work, university)"
 ---
 
 # GWorkspace Multi-Account
 
-Skill para operar múltiples cuentas de Google de forma aislada y segura.
+Skill for operating multiple Google accounts in an isolated and secure manner.
 
-## 🛠️ Componentes
+## 🛠️ Components
 
-| Archivo | Rol |
+| File | Role |
 |---|---|
-| `scripts/google_api.py` | Cliente principal — dispatcher a todos los servicios |
-| `scripts/setup.py` | Setup OAuth por perfil, revocación, verificación de estado |
-| `~/.hermes/gworkspace-multi.json` | Config unificada: `client_secret`, `profiles`, `pending` |
-| `~/.hermes/client_secret.json` | Credenciales globales del proyecto Google Cloud (estándar Hermes) |
+| `scripts/google_api.py` | Main client — dispatcher to all services |
+| `scripts/setup.py` | OAuth setup per profile, revocation, status verification |
+| `~/.hermes/gworkspace-multi.json` | Unified config: `client_secret`, `profiles`, `pending` |
+| `~/.hermes/client_secret.json` | Global Google Cloud project credentials (Hermes standard) |
 
-## 🚀 Sintaxis general
+## 🚀 General Syntax
 
 ```bash
 SCRIPT="python3 ${HERMES_SKILL_DIR}/scripts/google_api.py"
-$SCRIPT --profile <perfil> <servicio> <comando> [opciones]
+$SCRIPT --profile <profile> <service> <command> [options]
 ```
 
-> **Nota sobre `${HERMES_SKILL_DIR}`:** Este token se sustituye automáticamente por la ruta absoluta del directorio de esta skill al cargarse. No requiere configuración manual.
+> **Note on `${HERMES_SKILL_DIR}`:** This token is automatically replaced by the absolute path of this skill's directory upon loading. No manual configuration required.
 
-Todos los comandos devuelven **JSON por stdout**. Los errores tienen forma `{"status": "error", "error": "..."}`.
+All commands return **JSON via stdout**. Errors follow the format `{"status": "error", "error": "..."}`.
 
 ---
 
-## 📦 Sub-skills — cargar según necesidad
+## 📦 Sub-skills — Load as needed
 
-Antes de usar un servicio o configurar un perfil, carga la referencia correspondiente con `skill_view`.
+Before using a service or configuring a profile, load the corresponding reference with `skill_view`.
 
-| Sub-skill | Cuándo cargarla |
+| Sub-skill | When to load |
 |---|---|
-| `references/setup.md` | Autorizar un perfil nuevo, revocar token, instalar dependencias, verificar estado OAuth |
-| `references/gmail.md` | Buscar, leer, enviar, responder, etiquetar, borradores, programar correos |
-| `references/calendar.md` | Listar, crear, editar o eliminar eventos; listar calendarios |
-| `references/drive.md` | Buscar, subir, descargar, compartir, eliminar archivos; consultar actividad |
-| `references/docs.md` | Leer, crear o añadir contenido a Google Docs |
-| `references/sheets.md` | Leer, escribir o añadir filas en Google Sheets |
-| `references/tasks.md` | Gestionar listas y tareas (crear, completar, eliminar) |
-| `references/meet.md` | Crear y gestionar salas de Google Meet independientes |
-| `references/scripts.md` | Ejecutar o inspeccionar proyectos de Apps Script |
-| `references/contacts.md` | Listar contactos, buscar por nombre/email, gestionar grupos — incluye verificación de identidad |
+| `references/setup.md` | Authorize a new profile, revoke tokens, install dependencies, verify OAuth status |
+| `references/gmail.md` | Search, read, send, reply, label, drafts, schedule emails |
+| `references/calendar.md` | List, create, edit or delete events; list calendars |
+| `references/drive.md` | Search, upload, download, share, delete files; query activity |
+| `references/docs.md` | Read, create or add content to Google Docs |
+| `references/sheets.md` | Read, write or add rows in Google Sheets |
+| `references/tasks.md` | Manage lists and tasks (create, complete, delete) |
+| `references/meet.md` | Create and manage independent Google Meet spaces |
+| `references/scripts.md` | Execute or inspect Apps Script projects |
+| `references/contacts.md` | List contacts, search by name/email, manage groups — includes identity verification |
 
 ---
 
-## ⚠️ Pitfalls y Soluciones
+## ⚠️ Pitfalls & Solutions
 
-1. **Identificadores de Meet**: Al crear reuniones vía Calendar (`--create-meet`), la API devuelve un `conferenceId` (el código público del link). Para modificar la sala (ej. abrir acceso o activar moderación) vía la API de Meet, se requiere el `space_id` (formato `spaces/XYZ`). La skill ya resuelve esto automáticamente y retorna `space_id` en el resultado de `calendar create`.
-2. **Moderación**: Para activar el "Host Management", utiliza `meet patch-space <space_id> --moderation ON`.
-3. **Sincronización de Perfiles**: Siempre verifica la cuenta activa con `contacts list --max 1` antes de acciones destructivas para evitar errores de perfil.
+1. **Meet Identifiers**: When creating meetings via Calendar (`--create-meet`), the API returns a `conferenceId` (the public link code). To modify the room (e.g., open access or enable moderation) via the Meet API, the `space_id` (format `spaces/XYZ`) is required. The skill resolves this automatically and returns `space_id` in the `calendar create` result.
+2. **Moderation**: To enable "Host Management", use `meet patch-space <space_id> --moderation ON`.
+3. **Profile Synchronization**: Always verify the active account with `contacts list --max 1` before destructive actions to avoid profile errors.
+4. **Scheduled Sending**: The Gmail API does not support native scheduled sending. The correct flow is: `gmail schedule` $\rightarrow$ Create draft $\rightarrow$ Execute the generated `at` command to trigger `gmail draft-send`.
+5. **Git Cleanup**: When publishing the skill, avoid uploading temporary editor files (e.g., `*.swp`). These must be included in `.gitignore`.
 
 ---
 
-## 🔐 Seguridad y credenciales
+## 🔐 Security & Credentials
 
-- El archivo `gworkspace-multi.json` almacena tokens OAuth2 refrescables. Se crea con permisos `0o600` (solo lectura/escritura para el owner).
-- Los tokens se refrescan automáticamente cuando expiran.
+- The `gworkspace-multi.json` file stores refreshable OAuth2 tokens. It is created with `0o600` permissions.
+- Tokens refresh automatically upon expiration.
+- `client_secret.json` is stored once via `--client-secret` and reused for all profiles.
+- **Default Profile**: A `default_profile` can be defined in `gworkspace-multi.json` to avoid passing `--profile` in every command.
+- To revoke a profile's access: `python3 /home/ubuntu/.hermes/skills/productivity/gworkspace-multi/scripts/setup.py --revoke --profile <name>`
 
-## ⚠️ Pitfalls y Seguridad
+- **File Permissions**: Both `gworkspace-multi.json` and `client_secret.json` MUST have `0600` permissions (`chmod 600`) to prevent credential leaks.
 
-- **Permisos de Archivos**: Los archivos `gworkspace-multi.json` y `client_secret.json` DEBEN tener permisos `0600` (`chmod 600`) para evitar fugas de credenciales.
-- **Sincronización de Identidad**: No asumir que el perfil es correcto sin verificar: `python3 ... google_api.py --profile <perfil> contacts list --max 1`.
-- **Meet ID vs Code**: No utilizar el código público de la reunión (ej. `abc-defg-hij`) para modificar permisos mediante la API de Meet. Se debe utilizar el `space_id` (formato `spaces/XYZ`) que la función `calendar create` devuelve ahora automáticamente.
-- **Envío Programado de Gmail**: La API de Gmail no soporta el envío programado nativo. La skill implementa un flujo de **Borrador $\rightarrow$ Comando `at`**. El comando `at_command` devuelto por `gmail schedule` debe ejecutarse en la terminal para programar la entrega real.
-- **Gestión de Moderación**: Para activar el Host Management en una sala, usar `meet patch-space <space_id> --moderation ON`.
+## ⚠️ Critical Rules & Pitfalls
+
+1. **Profile Verification**: Before any destructive action or sending, verify the account:
+   `$SCRIPT --profile <profile> contacts list --max 1`
+2. **Meet Management**: To modify permissions of a room created via Calendar, the `space_id` (format `spaces/XYZ`) is required. The `calendar create` function now returns it automatically. Do not attempt to use the public URL code directly in `meet patch-space`.
+3. **Scheduled Sending**: Gmail API does not support native `scheduled send`. The correct flow is: `gmail schedule` $\rightarrow$ Create draft $\rightarrow$ Execute the generated `at` command to trigger `gmail draft-send`.
+- **Gmail Scheduled Sending**: The Gmail API does not support native scheduled sending. The skill implements a **Draft $\rightarrow$ `at` Command** flow. The `at_command` returned by `gmail schedule` must be executed in the terminal to schedule the actual delivery.
+- **Moderation Management**: To enable Host Management in a room, use `meet patch-space <space_id> --moderation ON`.
